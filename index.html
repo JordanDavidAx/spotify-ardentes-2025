@@ -370,55 +370,33 @@
         <header>
             <h1>🎵 Spotify x Les Ardentes 2025</h1>
             <p>Découvre quels artistes de tes likes sont au festival !</p>
-            <div class="github-badge">Prêt pour GitHub + Netlify</div>
+            <div class="github-badge">✅ App pré-configurée</div>
         </header>
 
         <main>
-            <!-- Section de configuration -->
+            <!-- Section de connexion -->
             <div id="setup-section" class="section">
                 <div class="card">
-                    <h2>🚀 Configuration GitHub + Netlify</h2>
-                    <p>Configure une seule fois, puis partage avec tout le monde !</p>
+                    <h2>🎵 Découvre tes artistes des Ardentes 2025</h2>
+                    <p>Connecte-toi à Spotify pour analyser tes likes et voir quels artistes du festival tu écoutes déjà !</p>
                     
-                    <div class="setup-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <strong>Déploie sur Netlify/GitHub Pages</strong><br>
-                            Une fois déployé, ton URL sera quelque chose comme :<br>
-                            <div class="url-display" id="example-url">https://ton-app.netlify.app</div>
-                        </div>
+                    <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; margin: 20px 0;">
+                        <h3>📊 Ce que nous allons analyser :</h3>
+                        <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
+                            <li>Tes likes Spotify (maximum 1000)</li>
+                            <li>Comparaison avec 50+ artistes des Ardentes 2025</li>
+                            <li>Statistiques personnalisées</li>
+                        </ul>
                     </div>
 
-                    <div class="setup-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <strong>Crée ton app Spotify</strong><br>
-                            Va sur <a href="https://developer.spotify.com/dashboard" target="_blank" style="color: var(--spotify-green);">developer.spotify.com/dashboard</a><br>
-                            Utilise cette URL comme Redirect URI :<br>
-                            <div class="url-display" id="redirect-url">
-                                <span id="current-url"></span>
-                                <button class="copy-btn" onclick="copyUrl()">Copier</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="setup-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <strong>Configure ton Client ID</strong><br>
-                            Colle ton Client ID Spotify ici :<br>
-                            <input type="text" id="client-id-input" class="client-id-input" 
-                                   placeholder="Colle ton Client ID Spotify ici...">
-                        </div>
-                    </div>
-
-                    <button id="connect-btn" class="spotify-btn" disabled>
+                    <button id="connect-btn" class="spotify-btn">
                         <span>🎧</span>
                         Se connecter avec Spotify
                     </button>
                     
                     <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted);">
-                        🔒 Tes données restent privées et ne sont jamais sauvegardées
+                        🔒 Tes données restent privées et ne sont jamais sauvegardées<br>
+                        ✅ Application pré-configurée - connexion directe !
                     </div>
                 </div>
             </div>
@@ -450,14 +428,14 @@
 
         <footer>
             <p>Créé avec ❤️ pour les fans des Ardentes | Données Spotify via l'API officielle</p>
-            <p style="font-size: 0.8rem;">🚀 Déployé sur GitHub + Netlify</p>
+            <p style="font-size: 0.8rem;">🚀 Hébergé sur Vercel - Prêt à l'emploi</p>
         </footer>
     </div>
 
     <script>
-        // Configuration - Remplace par ton Client ID Spotify
+        // Configuration - Client ID configuré
         const CONFIG = {
-            CLIENT_ID: 'REMPLACE_PAR_TON_CLIENT_ID_SPOTIFY',
+            CLIENT_ID: '90a205dc07554ea7b4d5e54e097c52f7',
             REDIRECT_URI: window.location.href.split('?')[0].split('#')[0],
             SCOPES: 'user-library-read user-read-private'
         };
@@ -486,55 +464,27 @@
         const setupSection = document.getElementById('setup-section');
         const loadingSection = document.getElementById('loading-section');
         const resultsSection = document.getElementById('results-section');
-        const clientIdInput = document.getElementById('client-id-input');
         const connectBtn = document.getElementById('connect-btn');
         const resetBtn = document.getElementById('reset-btn');
         const shareBtn = document.getElementById('share-btn');
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', () => {
-            // Afficher l'URL actuelle
-            document.getElementById('current-url').textContent = CONFIG.REDIRECT_URI;
-
             // Vérifier si on revient de Spotify
             const hash = window.location.hash.substr(1);
             if (hash) {
                 const params = new URLSearchParams(hash);
                 accessToken = params.get('access_token');
-                CONFIG.CLIENT_ID = localStorage.getItem('spotify_client_id');
                 
-                if (accessToken && CONFIG.CLIENT_ID && CONFIG.CLIENT_ID !== 'REMPLACE_PAR_TON_CLIENT_ID_SPOTIFY') {
+                if (accessToken) {
                     window.history.replaceState({}, document.title, window.location.pathname);
                     startAnalysis();
                     return;
                 }
             }
 
-            // Charger le Client ID sauvegardé
-            const savedClientId = localStorage.getItem('spotify_client_id');
-            if (savedClientId && savedClientId !== 'REMPLACE_PAR_TON_CLIENT_ID_SPOTIFY') {
-                clientIdInput.value = savedClientId;
-                CONFIG.CLIENT_ID = savedClientId;
-                connectBtn.disabled = false;
-            }
-
-            // Gestion de l'input Client ID
-            clientIdInput.addEventListener('input', (e) => {
-                const value = e.target.value.trim();
-                CONFIG.CLIENT_ID = value;
-                connectBtn.disabled = !value || value === 'REMPLACE_PAR_TON_CLIENT_ID_SPOTIFY';
-                
-                if (value && value !== 'REMPLACE_PAR_TON_CLIENT_ID_SPOTIFY') {
-                    localStorage.setItem('spotify_client_id', value);
-                }
-            });
-
             // Bouton de connexion
             connectBtn.addEventListener('click', () => {
-                if (!CONFIG.CLIENT_ID || CONFIG.CLIENT_ID === 'REMPLACE_PAR_TON_CLIENT_ID_SPOTIFY') {
-                    showError('Veuillez entrer un Client ID Spotify valide');
-                    return;
-                }
                 loginToSpotify();
             });
 
@@ -689,34 +639,28 @@
 
         function shareResults() {
             const text = matchingArtists.length > 0 
-                ? `🎵 J'ai trouvé ${matchingArtists.length} artistes des Ardentes 2025 dans mes likes Spotify ! Découvre les tiens :`
-                : `🎵 J'ai analysé mes likes pour les Ardentes 2025 ! Découvre tes artistes :`;
+                ? `🎵 J'ai trouvé ${matchingArtists.length} artistes des Ardentes 2025 dans mes likes Spotify ! 🎶`
+                : `🎵 J'ai analysé mes likes pour les Ardentes 2025 ! 🎶`;
             
-            const url = window.location.href;
+            const url = 'https://spotify-ardentes-2025.vercel.app/';
+            const fullText = `${text}\n\nDécouvre tes artistes sur : ${url}`;
             
             if (navigator.share) {
                 navigator.share({
                     title: 'Spotify x Ardentes 2025',
-                    text: text,
+                    text: fullText,
                     url: url
                 });
             } else {
-                navigator.clipboard.writeText(`${text} ${url}`).then(() => {
-                    showMessage('Lien copié dans le presse-papiers ! 📋');
+                navigator.clipboard.writeText(fullText).then(() => {
+                    showMessage('Message copié dans le presse-papiers ! 📋');
                 }).catch(() => {
-                    showMessage(`Partage ce lien : ${url}`);
+                    showMessage(`Partage : ${fullText}`);
                 });
             }
         }
 
-        function copyUrl() {
-            const url = document.getElementById('current-url').textContent;
-            navigator.clipboard.writeText(url).then(() => {
-                showMessage('URL copiée ! 📋');
-            }).catch(() => {
-                showMessage('Copie cette URL manuellement');
-            });
-        }
+
 
         function showSection(section) {
             [setupSection, loadingSection, resultsSection].forEach(el => {
