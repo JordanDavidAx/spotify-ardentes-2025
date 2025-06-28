@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify x Ardentes 2025 - DEMO</title>
+    <style>
+        :root {
+            --spotify-green: #1DB954;
+            --ardentes-orange: #FF6B35;
+            --ardentes-red: #E63946;
+            --dark-bg: #191414;
+            --card-bg: #282828;
+            --text-light: #FFFFFF;
+            --text-muted: #B3B3B3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #191414 0%, #333 50%, #FF6B35 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--spotify-green), var(--ardentes-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-badge {
+            background: var(--spotify-green);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--spotify-green), var(--ardentes-orange), var(--ardentes-red));
+            border-radius: 22px;
+            z-index: -1;
+        }
+
+        .setup-instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .setup-instructions h3 {
+            color: var(--ardentes-orange);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .step {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid var(--spotify-green);
+        }
+
+        .step strong {
+            color: var(--spotify-green);
+        }
+
+        .client-id-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--spotify-green);
+            border-radius: 8px;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            font-family: monospace;
+            margin: 10px 0;
+        }
+
+        .spotify-btn {
+            background: var(--spotify-green);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin: 20px 0;
+        }
+
+        .spotify-btn:hover {
+            background: #1ed760;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(29, 185, 84, 0.3);
+        }
+
+        .spotify-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .url-display {
+            background: var(--dark-bg);
+            border: 1px solid var(--spotify-green);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin: 10px 0;
+            color: var(--spotify-green);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .error-message {
+            background: var(--ardentes-red);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .success-message {
+            background: var(--spotify-green);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .artists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .artist-match {
+            background: linear-gradient(135deg, var(--spotify-green), var(--ardentes-orange));
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .artist-match:hover {
+            transform: translateY(-5px);
+        }
+
+        .loading-section {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--text-muted);
+            border-top: 4px solid var(--spotify-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--spotify-green);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .results-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎵 Spotify x Les Ardentes 2025</h1>
+            <p>Découvre quels artistes de tes likes sont au festival !</p>
+            <div class="demo-badge">Version de Démonstration</div>
+        </header>
+
+        <main>
+            <!-- Section Setup -->
+            <div id="setup-section">
+                <div class="login-card">
+                    <h2>🔧 Configuration Rapide</h2>
+                    <p>Pour que l'app fonctionne, nous devons configurer un vrai Client ID Spotify</p>
+                    
+                    <div class="setup-instructions">
+                        <h3>📋 Étapes (5 minutes max)</h3>
+                        
+                        <div class="step">
+                            <strong>1.</strong> Va sur <a href="https://developer.spotify.com/dashboard" target="_blank" style="color: var(--spotify-green);">developer.spotify.com/dashboard</a>
+                        </div>
+                        
+                        <div class="step">
+                            <strong>2.</strong> Connecte-toi avec ton compte Spotify
+                        </div>
+                        
+                        <div class="step">
+                            <strong>3.</strong> Clique "Create app" et remplis :
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li><strong>App name :</strong> Spotify Ardentes Demo</li>
+                                <li><strong>Description :</strong> Test app pour les Ardentes</li>
+                                <li><strong>Redirect URI :</strong> <div class="url-display" id="current-url"></div></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="step">
+                            <strong>4.</strong> Sauvegarde et récupère le <strong>Client ID</strong>
+                        </div>
+                        
+                        <div class="step">
+                            <strong>5.</strong> Colle ton Client ID ici :
+                            <input type="text" id="client-id-input" class="client-id-input" placeholder="Colle ton Client ID Spotify ici...">
+                        </div>
+                    </div>
+
+                    <button id="test-btn" class="spotify-btn" disabled>
+                        <span>🎧</span>
+                        Tester avec Spotify
+                    </button>
+                    
+                    <p style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted);">
+                        Une fois configuré, tu pourras partager cette URL avec qui tu veux !
+                    </p>
+                </div>
+            </div>
+
+            <!-- Section de chargement -->
+            <div id="loading-section" class="loading-section hidden">
+                <div class="spinner"></div>
+                <h2>Analyse en cours...</h2>
+                <p>Récupération de tes likes et comparaison avec les Ardentes 2025</p>
+            </div>
+
+            <!-- Section des résultats -->
+            <div id="results-section" class="hidden">
+                <div class="results-card">
+                    <h2>🎉 Tes artistes des Ardentes 2025</h2>
+                    <div id="user-info" class="user-info"></div>
+                    <div id="stats-container"></div>
+                    <div id="matching-artists" class="artists-grid"></div>
+                    <button id="reset-btn" class="spotify-btn">🔄 Recommencer</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Créé avec ❤️ pour les fans des Ardentes | Spotify API Demo</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configuration
+        let CLIENT_ID = '';
+        const REDIRECT_URI = window.location.href.split('?')[0].split('#')[0];
+        const SCOPES = 'user-library-read user-read-private';
+
+        // Artistes des Ardentes 2025
+        const ARDENTES_ARTISTS = [
+            'Tiësto', 'David Guetta', 'Calvin Harris', 'Marshmello', 'The Chainsmokers',
+            'Dua Lipa', 'Doja Cat', 'Tyler, The Creator', 'Travis Scott', 'Future',
+            'Central Cee', 'Skepta', 'Dave', 'Stormzy', 'AJ Tracey',
+            'Booba', 'PNL', 'Orelsan', 'Stromae', 'Angèle',
+            'Charlotte de Witte', 'Amelie Lens', 'Nina Kraviz', 'Tale of Us', 'Maceo Plex',
+            'Arctic Monkeys', 'Tame Impala', 'Glass Animals', 'The 1975', 'Foals',
+            'Bad Bunny', 'Rosalía', 'J Balvin', 'Ozuna', 'Karol G',
+            'Billie Eilish', 'Lorde', 'Clairo', 'Phoebe Bridgers', 'Lana Del Rey',
+            'Disclosure', 'ODESZA', 'Flume', 'Porter Robinson', 'Madeon',
+            'Burna Boy', 'Wizkid', 'Davido', 'Tems', 'Amaarae'
+        ];
+
+        // Variables
+        let accessToken = null;
+        let userProfile = null;
+        let userTracks = [];
+        let matchingArtists = [];
+
+        // Éléments DOM
+        const setupSection = document.getElementById('setup-section');
+        const loadingSection = document.getElementById('loading-section');
+        const resultsSection = document.getElementById('results-section');
+        const clientIdInput = document.getElementById('client-id-input');
+        const testBtn = document.getElementById('test-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Afficher l'URL actuelle
+            document.getElementById('current-url').textContent = REDIRECT_URI;
+
+            // Vérifier si on revient de Spotify
+            const hash = window.location.hash.substr(1);
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                accessToken = params.get('access_token');
+                CLIENT_ID = localStorage.getItem('spotify_client_id');
+                
+                if (accessToken && CLIENT_ID) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    startAnalysis();
+                }
+            }
+
+            // Charger le Client ID sauvegardé
+            const savedClientId = localStorage.getItem('spotify_client_id');
+            if (savedClientId) {
+                clientIdInput.value = savedClientId;
+                CLIENT_ID = savedClientId;
+                testBtn.disabled = false;
+            }
+
+            // Gestion de l'input Client ID
+            clientIdInput.addEventListener('input', (e) => {
+                const value = e.target.value.trim();
+                CLIENT_ID = value;
+                testBtn.disabled = !value;
+                
+                if (value) {
+                    localStorage.setItem('spotify_client_id', value);
+                }
+            });
+
+            // Bouton de test
+            testBtn.addEventListener('click', () => {
+                if (!CLIENT_ID) {
+                    showError('Veuillez entrer un Client ID');
+                    return;
+                }
+                loginToSpotify();
+            });
+
+            // Bouton reset
+            resetBtn.addEventListener('click', () => {
+                showSection('setup');
+            });
+        });
+
+        function loginToSpotify() {
+            const authUrl = `https://accounts.spotify.com/authorize?` +
+                `client_id=${CLIENT_ID}&` +
+                `response_type=token&` +
+                `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
+                `scope=${encodeURIComponent(SCOPES)}&` +
+                `show_dialog=true`;
+            
+            window.location.href = authUrl;
+        }
+
+        async function startAnalysis() {
+            showSection('loading');
+            
+            try {
+                userProfile = await getUserProfile();
+                userTracks = await getAllUserTracks();
+                matchingArtists = findMatchingArtists();
+                displayResults();
+                showMessage('✅ Analyse terminée avec succès !');
+            } catch (error) {
+                console.error('Erreur:', error);
+                showError('Erreur lors de l\'analyse. Vérifiez votre Client ID.');
+                showSection('setup');
+            }
+        }
+
+        async function getUserProfile() {
+            const response = await fetch('https://api.spotify.com/v1/me', {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erreur API Spotify');
+            }
+            
+            return await response.json();
+        }
+
+        async function getAllUserTracks() {
+            let allTracks = [];
+            let url = 'https://api.spotify.com/v1/me/tracks?limit=50';
+            
+            while (url && allTracks.length < 1000) {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                
+                if (!response.ok) break;
+                
+                const data = await response.json();
+                allTracks = allTracks.concat(data.items);
+                url = data.next;
+                
+                // Délai pour éviter le rate limiting
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            return allTracks;
+        }
+
+        function findMatchingArtists() {
+            const userArtists = new Set();
+            
+            userTracks.forEach(item => {
+                if (item.track?.artists) {
+                    item.track.artists.forEach(artist => {
+                        userArtists.add(artist.name.toLowerCase());
+                    });
+                }
+            });
+
+            return ARDENTES_ARTISTS.filter(artist => 
+                userArtists.has(artist.toLowerCase())
+            ).map(artist => ({
+                name: artist,
+                tracks: userTracks.filter(item => 
+                    item.track?.artists?.some(a => 
+                        a.name.toLowerCase() === artist.toLowerCase()
+                    )
+                ).slice(0, 3)
+            }));
+        }
+
+        function displayResults() {
+            showSection('results');
+
+            // Info utilisateur
+            document.getElementById('user-info').innerHTML = `
+                <div>
+                    <h3>Salut ${userProfile.display_name || 'Utilisateur'} ! 👋</h3>
+                    <p>${userTracks.length} likes analysés</p>
+                </div>
+            `;
+
+            // Statistiques
+            const statsHtml = `
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">${matchingArtists.length}</div>
+                        <div class="stat-label">Artistes trouvés</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">${userTracks.length}</div>
+                        <div class="stat-label">Likes analysés</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">${Math.round((matchingArtists.length / ARDENTES_ARTISTS.length) * 100)}%</div>
+                        <div class="stat-label">Du festival découvert</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('stats-container').innerHTML = statsHtml;
+
+            // Artistes correspondants
+            const artistsGrid = document.getElementById('matching-artists');
+            if (matchingArtists.length === 0) {
+                artistsGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <h3>🎵 Nouveaux horizons musicaux !</h3>
+                        <p>Tu n'as pas encore découvert ces artistes des Ardentes 2025.</p>
+                        <p>C'est l'occasion parfaite d'élargir tes goûts ! 🚀</p>
+                    </div>
+                `;
+            } else {
+                artistsGrid.innerHTML = matchingArtists.map(artist => `
+                    <div class="artist-match">
+                        <h4>🎤 ${artist.name}</h4>
+                        <p><strong>${artist.tracks.length}</strong> chanson${artist.tracks.length > 1 ? 's' : ''}</p>
+                        <p style="font-size: 0.9rem; opacity: 0.9;">
+                            ${artist.tracks.map(item => item.track.name).slice(0, 2).join(', ')}
+                        </p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showSection(section) {
+            [setupSection, loadingSection, resultsSection].forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            switch(section) {
+                case 'setup': setupSection.classList.remove('hidden'); break;
+                case 'loading': loadingSection.classList.remove('hidden'); break;
+                case 'results': resultsSection.classList.remove('hidden'); break;
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('main'));
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function showMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'success-message';
+            messageDiv.textContent = message;
+            document.querySelector('.container').insertBefore(messageDiv, document.querySelector('main'));
+            setTimeout(() => messageDiv.remove(), 3000);
+        }
+    </script>
+</body>
+</html> 

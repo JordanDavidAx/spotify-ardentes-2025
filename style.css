@@ -1,0 +1,539 @@
+/* Variables CSS pour les couleurs */
+:root {
+    --spotify-green: #1DB954;
+    --ardentes-orange: #FF6B35;
+    --ardentes-red: #E63946;
+    --dark-bg: #191414;
+    --card-bg: #282828;
+    --text-light: #FFFFFF;
+    --text-muted: #B3B3B3;
+    --gradient-bg: linear-gradient(135deg, #191414 0%, #333 50%, #FF6B35 100%);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--gradient-bg);
+    color: var(--text-light);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 40px 0;
+}
+
+header h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    background: linear-gradient(45deg, var(--spotify-green), var(--ardentes-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+header p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+}
+
+/* Sections */
+.section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Cards */
+.login-card, .loading-card, .results-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+}
+
+.login-card::before, .loading-card::before, .results-card::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--spotify-green), var(--ardentes-orange), var(--ardentes-red));
+    border-radius: 22px;
+    z-index: -1;
+}
+
+.login-card h2, .loading-card h2, .results-card h2 {
+    margin-bottom: 20px;
+    color: var(--text-light);
+    font-size: 2rem;
+}
+
+.login-card p, .loading-card p {
+    margin-bottom: 30px;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Boutons */
+.spotify-btn {
+    background: var(--spotify-green);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.spotify-btn:hover {
+    background: #1ed760;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(29, 185, 84, 0.3);
+}
+
+.spotify-icon {
+    font-size: 1.3rem;
+}
+
+.reset-btn {
+    background: var(--ardentes-orange);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+    background: var(--ardentes-red);
+    transform: translateY(-2px);
+}
+
+/* Spinner de chargement */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--text-muted);
+    border-top: 4px solid var(--spotify-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Info utilisateur */
+.user-info {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: center;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid var(--spotify-green);
+}
+
+/* Grille des artistes correspondants */
+.artists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.artist-match {
+    background: linear-gradient(135deg, var(--spotify-green), var(--ardentes-orange));
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.artist-match:hover {
+    transform: translateY(-5px) scale(1.02);
+}
+
+.artist-match h4 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.artist-match p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Liste complète des artistes */
+.all-artists {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 30px;
+}
+
+.all-artists h3 {
+    color: var(--ardentes-orange);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.artists-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.artist-item {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.artist-item:hover {
+    border-color: var(--ardentes-orange);
+    transform: translateY(-2px);
+}
+
+.artist-item.matched {
+    border-color: var(--spotify-green);
+    background: rgba(29, 185, 84, 0.1);
+}
+
+/* Statistiques */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--spotify-green);
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    color: var(--text-muted);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .login-card, .loading-card, .results-card {
+        padding: 30px 20px;
+    }
+    
+    .artists-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Message d'erreur */
+.error-message {
+    background: var(--ardentes-red);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+/* Message de succès */
+.success-message {
+    background: var(--spotify-green);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+/* Configuration error */
+.config-error {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.config-error ol {
+    color: var(--text-light);
+    padding-left: 20px;
+}
+
+.config-error li {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.config-error code {
+    background: var(--dark-bg);
+    color: var(--spotify-green);
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+}
+
+.config-error a {
+    color: var(--spotify-green);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.config-error a:hover {
+    text-decoration: underline;
+}
+
+/* Version publique - styles additionnels */
+.version-badge {
+    background: var(--spotify-green);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.security-note {
+    background: rgba(29, 185, 84, 0.1);
+    border: 1px solid var(--spotify-green);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+    color: var(--spotify-green);
+}
+
+.info-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 30px;
+    text-align: left;
+}
+
+.info-section h3 {
+    color: var(--ardentes-orange);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.info-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info-section li {
+    margin: 10px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-section li:last-child {
+    border-bottom: none;
+}
+
+.loading-progress {
+    margin-top: 30px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--spotify-green), var(--ardentes-orange));
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.recommendations {
+    background: rgba(255, 107, 53, 0.1);
+    border: 1px solid var(--ardentes-orange);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 30px 0;
+}
+
+.recommendations h3 {
+    color: var(--ardentes-orange);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.recommended {
+    background: linear-gradient(135deg, var(--ardentes-orange), var(--ardentes-red));
+    color: white;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    background: linear-gradient(135deg, #1DA1F2, #1991DB);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(29, 161, 242, 0.3);
+}
+
+.artist-rank {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 1.2rem;
+    background: var(--card-bg);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.artist-match {
+    position: relative;
+}
+
+.privacy-note {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+}
+
+.no-matches {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    margin: 20px 0;
+}
+
+.no-matches h3 {
+    color: var(--ardentes-orange);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.no-matches p {
+    color: var(--text-muted);
+    margin: 10px 0;
+} 

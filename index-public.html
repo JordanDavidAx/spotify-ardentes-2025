@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify x Ardentes 2025 - Version Publique</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎵 Spotify x Les Ardentes 2025</h1>
+            <p>Découvre quels artistes de tes likes sont au festival !</p>
+            <div class="version-badge">Version publique - Aucune configuration requise</div>
+        </header>
+
+        <main>
+            <!-- Section de connexion -->
+            <div id="login-section" class="section">
+                <div class="login-card">
+                    <h2>Connecte-toi à Spotify</h2>
+                    <p>Nous allons analyser tes likes pour voir quels artistes des Ardentes 2025 tu écoutes déjà !</p>
+                    <p class="security-note">🔒 Tes données restent privées et ne sont jamais sauvegardées</p>
+                    <button id="login-btn" class="spotify-btn">
+                        <span class="spotify-icon">🎧</span>
+                        Se connecter avec Spotify
+                    </button>
+                    <div class="info-section">
+                        <h3>Comment ça marche ?</h3>
+                        <ul>
+                            <li>✅ <strong>Connexion sécurisée</strong> via Spotify OAuth</li>
+                            <li>✅ <strong>Lecture seule</strong> de tes likes (aucune modification)</li>
+                            <li>✅ <strong>Analyse instantanée</strong> avec les artistes des Ardentes</li>
+                            <li>✅ <strong>Aucune donnée sauvegardée</strong> sur nos serveurs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section de chargement -->
+            <div id="loading-section" class="section hidden">
+                <div class="loading-card">
+                    <div class="spinner"></div>
+                    <h2>Analyse en cours...</h2>
+                    <p>Nous récupérons tes likes et comparons avec les artistes des Ardentes 2025</p>
+                    <div class="loading-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <p id="loading-status">Connexion à Spotify...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section des résultats -->
+            <div id="results-section" class="section hidden">
+                <div class="results-card">
+                    <h2>🎉 Tes artistes des Ardentes 2025</h2>
+                    <div id="user-info" class="user-info"></div>
+                    
+                    <div id="matching-artists" class="artists-grid">
+                        <!-- Les artistes correspondants seront affichés ici -->
+                    </div>
+
+                    <div id="recommendations" class="recommendations">
+                        <h3>🎯 Recommandations pour toi</h3>
+                        <p>Découvre d'autres artistes des Ardentes qui pourraient te plaire !</p>
+                        <div id="recommended-artists" class="artists-list">
+                            <!-- Recommandations basées sur les goûts -->
+                        </div>
+                    </div>
+
+                    <div id="all-ardentes-artists" class="all-artists">
+                        <h3>Tous les artistes des Ardentes 2025</h3>
+                        <div id="ardentes-list" class="artists-list">
+                            <!-- La liste complète sera affichée ici -->
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="share-btn" class="share-btn">📱 Partager mes résultats</button>
+                        <button id="reset-btn" class="reset-btn">🔄 Recommencer</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Créé avec ❤️ pour les fans des Ardentes | Données Spotify via l'API officielle</p>
+            <p class="privacy-note">🔒 Application sécurisée - Aucune donnée personnelle n'est stockée</p>
+        </footer>
+    </div>
+
+    <script src="script-public.js"></script>
+</body>
+</html> 
