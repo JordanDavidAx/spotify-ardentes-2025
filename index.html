@@ -363,6 +363,234 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Bouton Voir plus */
+        .voir-plus-btn {
+            background: linear-gradient(45deg, var(--spotify-green), var(--ardentes-orange));
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .voir-plus-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #333 100%);
+            margin: 2% auto;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--spotify-green), var(--ardentes-orange), var(--ardentes-red));
+            border-radius: 22px;
+            z-index: -1;
+        }
+
+        @keyframes modalSlideIn {
+            from { 
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 30px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s ease;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--spotify-green);
+        }
+
+        .artist-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .artist-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--spotify-green);
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(29, 185, 84, 0.3);
+        }
+
+        .artist-details h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--spotify-green), var(--ardentes-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .artist-stats, .artist-genres {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 5px 0;
+        }
+
+        .artist-stats {
+            font-weight: bold;
+            color: var(--spotify-green);
+        }
+
+        .modal-body {
+            padding: 20px 30px 30px;
+        }
+
+        .modal-body h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        .tracks-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .tracks-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tracks-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .tracks-list::-webkit-scrollbar-thumb {
+            background: var(--spotify-green);
+            border-radius: 4px;
+        }
+
+        .track-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .track-item:hover {
+            background: rgba(29, 185, 84, 0.1);
+            border-left-color: var(--spotify-green);
+            transform: translateX(5px);
+        }
+
+        .track-number {
+            color: var(--text-muted);
+            font-weight: bold;
+            min-width: 25px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .track-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .track-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .track-name {
+            font-weight: bold;
+            color: var(--text-light);
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-album {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-duration {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            min-width: 40px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -833,8 +1061,10 @@
                     item.track?.artists?.some(a => 
                         a.name.toLowerCase() === artist.toLowerCase()
                     )
-                ).slice(0, 3);
+                ); // ✅ LIMITATION SUPPRIMÉE - TOUTES LES CHANSONS !
 
+                console.log(`🎤 DEBUG: ${artist} - Chansons trouvées AVANT limitation: ${matchingTracks.length}`);
+                console.log(`📝 DEBUG: Détail des chansons de ${artist}:`, matchingTracks.map(item => item.track.name));
                 logDebug(`✅ Match trouvé: ${artist}`, { tracks: matchingTracks.length });
                 
                 return {
@@ -893,15 +1123,23 @@
                     </div>
                 `;
             } else {
-                artistsGrid.innerHTML = matchingArtists.map(artist => `
-                    <div class="artist-match fade-in">
-                        <h4>🎤 ${artist.name}</h4>
-                        <p><strong>${artist.tracks.length}</strong> chanson${artist.tracks.length > 1 ? 's' : ''}</p>
-                        <p style="font-size: 0.9rem; opacity: 0.9;">
-                            ${artist.tracks.map(item => item.track.name).slice(0, 2).join(', ')}
-                        </p>
-                    </div>
-                `).join('');
+                artistsGrid.innerHTML = matchingArtists.map(artist => {
+                    const tracksList = artist.tracks.slice(0, 2).map(item => item.track.name).join(', ');
+                    const hasMoreTracks = artist.tracks.length > 2;
+                    
+                    console.log(`🎤 DEBUG: Affichage ${artist.name} - ${artist.tracks.length} chansons, hasMoreTracks: ${hasMoreTracks}`);
+                    
+                    return `
+                        <div class="artist-match fade-in">
+                            <h4>🎤 ${artist.name}</h4>
+                            <p><strong>${artist.tracks.length}</strong> chanson${artist.tracks.length > 1 ? 's' : ''}</p>
+                            <p style="font-size: 0.9rem; opacity: 0.9;">
+                                ${tracksList}${hasMoreTracks ? '...' : ''}
+                            </p>
+                            ${hasMoreTracks ? `<button class="voir-plus-btn" onclick="openArtistModal('${artist.name.replace(/'/g, "\\'")}')">Voir plus</button>` : ''}
+                        </div>
+                    `;
+                }).join('');
             }
         }
 
@@ -956,6 +1194,99 @@
             messageDiv.textContent = message;
             document.querySelector('.container').insertBefore(messageDiv, document.querySelector('main'));
             setTimeout(() => messageDiv.remove(), 3000);
+        }
+
+        // ✅ NOUVELLES FONCTIONS MODAL
+        
+        // Ouvrir la modal d'un artiste
+        function openArtistModal(artistName) {
+            console.log(`🎭 DEBUG: Ouverture modal pour ${artistName}`);
+            const artist = matchingArtists.find(a => a.name === artistName);
+            if (!artist) {
+                console.error(`❌ DEBUG: Artiste ${artistName} non trouvé dans matchingArtists`);
+                return;
+            }
+            
+            console.log(`📊 DEBUG: Données artiste modal:`, {
+                name: artist.name,
+                tracksCount: artist.tracks.length,
+                trackNames: artist.tracks.map(t => t.track.name)
+            });
+            
+            const modal = document.getElementById('artistModal') || createArtistModal();
+            const modalContent = modal.querySelector('.modal-content');
+            
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <span class="modal-close" onclick="closeArtistModal()">&times;</span>
+                    <div class="artist-profile">
+                        <img src="https://via.placeholder.com/120x120/1DB954/FFFFFF?text=🎵" alt="${artist.name}" class="artist-image">
+                        <div class="artist-details">
+                            <h2>${artist.name}</h2>
+                            <p class="artist-stats">🎵 Artiste des Ardentes 2025</p>
+                            <p class="artist-genres">Découvert dans tes likes Spotify !</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <h3>Tes chansons likées (${artist.tracks.length})</h3>
+                    <div class="tracks-list">
+                        ${artist.tracks.map((item, index) => `
+                            <div class="track-item">
+                                <div class="track-number">${index + 1}</div>
+                                <img src="${item.track.album?.images?.[2]?.url || item.track.album?.images?.[0]?.url || 'https://via.placeholder.com/50x50/282828/FFFFFF?text=🎵'}" 
+                                     alt="${item.track.name}" class="track-image">
+                                <div class="track-info">
+                                    <div class="track-name">${item.track.name}</div>
+                                    <div class="track-album">${item.track.album?.name || 'Album inconnu'}</div>
+                                </div>
+                                <div class="track-duration">${formatDuration(item.track.duration_ms)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+            console.log(`✅ DEBUG: Modal affichée avec ${artist.tracks.length} chansons`);
+        }
+
+        // Créer la modal si elle n'existe pas
+        function createArtistModal() {
+            const modal = document.createElement('div');
+            modal.id = 'artistModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <!-- Contenu généré dynamiquement -->
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Fermer en cliquant à l'extérieur
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeArtistModal();
+                }
+            });
+            
+            return modal;
+        }
+
+        // Fermer la modal
+        function closeArtistModal() {
+            const modal = document.getElementById('artistModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Formater la durée (ms -> mm:ss)
+        function formatDuration(ms) {
+            const minutes = Math.floor(ms / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
     </script>
 </body>
