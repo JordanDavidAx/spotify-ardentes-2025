@@ -928,7 +928,7 @@
                                 <li>Créer un <strong>JWT Developer Token</strong></li>
                                 <li>Saisir les informations ci-dessus</li>
                             </ol>
-                            <p>📖 <a href="GUIDE-APPLE-MUSIC.md" target="_blank" style="color: var(--spotify-green);">Guide complet</a></p>
+                            <p>📖 <a href="#" onclick="downloadAppleGuide(); return false;" style="color: var(--spotify-green); cursor: pointer;">Guide complet</a></p>
                         </div>
                     </div>
                 </div>
@@ -2263,6 +2263,259 @@
         function forceConnect() {
             logDebug('🚀 FORCE: Connexion forcée !');
             handleConnect();
+        }
+
+        // ===== FONCTION DE TÉLÉCHARGEMENT =====
+        
+        async function downloadAppleGuide() {
+            logDebug('📥 Téléchargement du guide Apple Music...');
+            
+            try {
+                // Contenu du guide Apple Music
+                const guideContent = `# 🍎 Guide Apple Music - Ardentes 2025
+
+## 📋 Vue d'ensemble
+
+L'application **Spotify x Ardentes 2025** supporte maintenant **Apple Music** ! Tu peux analyser ta bibliothèque Apple Music pour découvrir quels artistes des Ardentes 2025 tu écoutes déjà.
+
+## ⚡ Démarrage rapide
+
+### 1. Sélectionner Apple Music
+- Ouvre l'application
+- Clique sur le bouton **🍎 Apple Music** 
+- L'interface s'adapte automatiquement
+
+### 2. Configuration dans l'interface
+
+✅ **NOUVEAU :** Plus besoin de modifier le code ! Tout se configure directement dans l'app.
+
+1. **Sélectionne Apple Music** dans l'interface
+2. **Saisis tes informations** dans les champs de configuration
+3. **Clique sur "💾 Sauvegarder"**
+4. **Connecte-toi** avec le bouton de connexion
+
+## 🔧 Configuration développeur Apple Music
+
+### Prérequis
+- **Compte Apple Developer** (gratuit ou payant)
+- **Connaissances techniques** de base
+- **Accès aux outils développeur**
+
+### Étapes détaillées
+
+#### 1. Créer un compte Apple Developer
+\`\`\`
+👉 https://developer.apple.com
+- Inscris-toi ou connecte-toi
+- Accepte les conditions d'utilisation
+\`\`\`
+
+#### 2. Créer un MusicKit Identifier
+\`\`\`
+1. Va dans "Certificates, Identifiers & Profiles"
+2. Clique sur "Identifiers"
+3. Clique sur "+" pour créer un nouvel identifier
+4. Sélectionne "MusicKit"
+5. Donne un nom à ton identifier
+6. Note ton "MusicKit Identifier" (ex: com.example.myapp.musickit)
+\`\`\`
+
+#### 3. Créer une clé privée
+\`\`\`
+1. Va dans "Keys" dans les Developer Tools
+2. Clique sur "+" pour créer une nouvelle clé
+3. Donne un nom à ta clé
+4. Coche "MusicKit"
+5. Télécharge le fichier .p8 (GARDE-LE PRÉCIEUSEMENT!)
+6. Note ton "Key ID" (ex: 1234567890)
+7. Note ton "Team ID" (dans ton profil développeur)
+\`\`\`
+
+#### 4. Créer le Developer Token (JWT)
+
+Tu dois créer un **JSON Web Token (JWT)** signé avec ta clé privée.
+
+**Exemple de script Node.js:**
+\`\`\`javascript
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
+
+// Remplace par tes valeurs
+const TEAM_ID = 'TON_TEAM_ID';           // Dans ton compte développeur
+const KEY_ID = 'TON_KEY_ID';             // De l'étape 3
+const PRIVATE_KEY = fs.readFileSync('AuthKey_TON_KEY_ID.p8', 'utf8');
+
+const token = jwt.sign({}, PRIVATE_KEY, {
+    algorithm: 'ES256',
+    expiresIn: '180d',
+    issuer: TEAM_ID,
+    header: {
+        alg: 'ES256',
+        kid: KEY_ID
+    }
+});
+
+console.log('Developer Token:', token);
+\`\`\`
+
+#### 5. Configuration dans l'application
+
+✅ **Plus simple maintenant !** Pas besoin de modifier le code :
+
+1. **Sélectionne Apple Music** dans l'interface
+2. **Colle ton JWT** dans le champ "Developer Token"
+3. **Saisis ton Team ID** (optionnel)
+4. **Saisis ton Key ID** (optionnel)
+5. **Clique "💾 Sauvegarder"**
+
+Tes configurations sont **sauvegardées en localStorage** et persistent entre les sessions !
+
+## 🎵 Utilisation
+
+### Interface de configuration
+- 🔧 **Sections dédiées** : Spotify et Apple Music séparées
+- 💾 **Sauvegarde automatique** : localStorage
+- ✅ **Validation visuelle** : Sections vertes/rouges selon la config
+- 🔄 **Réinitialisation** : Bouton pour tout effacer
+
+### Fonctionnalités Apple Music
+- ✅ **Bibliothèque complète** : Analyse tous tes morceaux Apple Music
+- ✅ **Même interface** : Identique à Spotify
+- ✅ **Modal détaillée** : Bouton "Voir plus" avec toutes les chansons
+- ✅ **Statistiques** : Mêmes statistiques que Spotify
+
+### Différences avec Spotify
+| Fonctionnalité | Spotify | Apple Music |
+|----------------|---------|-------------|
+| **Configuration** | Client ID simple | JWT + Team ID + Key ID |
+| **Connexion** | OAuth simple | MusicKit JS |
+| **Données** | Likes seulement | Bibliothèque complète |
+| **Profil** | Photo & nom | Générique |
+| **Setup** | ✅ Interface simple | ⚠️ Plus complexe |
+
+## 🔍 Données analysées
+
+### Apple Music récupère :
+- **Tous les morceaux** de ta bibliothèque
+- **Artistes** et **albums**
+- **Durées** des morceaux
+- **Images** des albums
+
+### Limite actuelle :
+- **1000 morceaux** maximum (même que Spotify)
+- **Pagination automatique**
+- **Rate limiting** respecté
+
+## 🛠️ Dépannage
+
+### Erreurs fréquentes
+
+#### "Developer Token non configuré"
+\`\`\`
+❌ Problème : Champ vide ou token invalide
+✅ Solution : Saisis un JWT valide dans l'interface
+\`\`\`
+
+#### "Le Developer Token doit être un JWT valide"
+\`\`\`
+❌ Problème : Format JWT incorrect
+✅ Solution : Le token doit avoir 3 parties séparées par des points
+\`\`\`
+
+#### "Impossible d'initialiser Apple Music"
+\`\`\`
+❌ Problème : Token expiré ou permissions insuffisantes
+✅ Solution : Régénère un nouveau JWT avec une clé valide
+\`\`\`
+
+#### "Autorisation refusée"
+\`\`\`
+❌ Problème : Utilisateur n'a pas Apple Music
+✅ Solution : Abonnement Apple Music requis
+\`\`\`
+
+### Logs de débogage
+
+Active la console développeur pour voir les logs :
+\`\`\`
+🍎 Initialisation Apple Music MusicKit
+📊 Démarrage analyse Apple Music
+🎵 Récupération bibliothèque Apple Music
+🔍 Analyse correspondances Apple Music
+\`\`\`
+
+### Validation visuelle
+
+L'interface t'aide à comprendre l'état :
+- 🟢 **Section verte** : Configuration valide
+- 🔴 **Section rouge** : Configuration requise
+- ✨ **Animation** : Champ requis manquant
+- ✅ **Status** : Configuration OK/KO
+
+## 💡 Conseils
+
+### Sécurité
+- ⚠️ **Ne partage JAMAIS** ta clé privée (.p8)
+- ⚠️ **Attention aux tokens** : Ne les publie pas en ligne
+- ✅ **localStorage** : Les configs restent sur ton navigateur
+
+### Performance
+- Les **tokens JWT** expirent (max 6 mois)
+- Renouvelle ton token régulièrement
+- Apple Music peut être plus lent que Spotify
+- **Sauvegarde locale** : Pas besoin de ressaisir à chaque fois
+
+### Utilisateurs
+- **Abonnement Apple Music** requis
+- Compatible avec **tous les appareils**
+- Fonctionne sur **iOS, Android, Web**
+- **Configuration persistante** : Une fois fait, c'est sauvé !
+
+## 🆘 Support
+
+Si tu rencontres des problèmes :
+
+1. **Vérifie** l'état visuel des sections (vert/rouge)
+2. **Consulte** les logs dans la console
+3. **Teste** d'abord avec Spotify (plus simple)
+4. **Utilise** le bouton "🗑️ Réinitialiser" en cas de problème
+5. **Relis** ce guide étape par étape
+
+## 🎯 Avantages du nouveau système
+
+### ✅ Pour toi :
+- **Plus simple** : Configuration dans l'interface
+- **Plus sûr** : Pas de code à modifier
+- **Persistant** : Sauvegarde automatique
+- **Visuel** : Feedback immédiat sur l'état
+
+### ✅ Pour les développeurs :
+- **Pas de hardcoding** : Plus de clés en dur
+- **Flexible** : Chaque utilisateur ses clés
+- **Maintenable** : Pas de rebuild nécessaire
+
+---
+
+**🎵 Configuration Apple Music simplifiée ! 🍎**`;
+
+                // Créer le blob et télécharger
+                const blob = new Blob([guideContent], { type: 'text/markdown' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'GUIDE-APPLE-MUSIC.md';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                logDebug('✅ Guide Apple Music téléchargé !');
+                showMessage('📥 Guide Apple Music téléchargé !');
+                
+            } catch (error) {
+                logDebug('❌ Erreur téléchargement guide', error);
+                showError('Erreur lors du téléchargement du guide');
+            }
         }
     </script>
 </body>
