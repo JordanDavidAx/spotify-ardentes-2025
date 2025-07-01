@@ -128,7 +128,7 @@ function findMatchingArtists() {
             item.track?.artists?.some(a => 
                 a.name.toLowerCase() === artist.toLowerCase()
             )
-        ).slice(0, 3)
+        )
     }));
 }
 
@@ -175,13 +175,19 @@ function displayResults() {
         `;
         grid.insertAdjacentHTML('beforebegin', stats);
         
-        grid.innerHTML = matchingArtists.map(artist => `
-            <div class="artist-match fade-in">
-                <h4>🎤 ${artist.name}</h4>
-                <p><strong>${artist.tracks.length}</strong> chanson${artist.tracks.length > 1 ? 's' : ''}</p>
-                <p class="track-list">${artist.tracks.map(item => item.track.name).join(', ')}</p>
-            </div>
-        `).join('');
+        grid.innerHTML = matchingArtists.map(artist => {
+            const tracksList = artist.tracks.slice(0, 2).map(item => item.track.name).join(', ');
+            const hasMoreTracks = artist.tracks.length > 2;
+            
+            return `
+                <div class="artist-match fade-in">
+                    <h4>🎤 ${artist.name}</h4>
+                    <p><strong>${artist.tracks.length}</strong> chanson${artist.tracks.length > 1 ? 's' : ''}</p>
+                    <p class="track-list">${tracksList}${hasMoreTracks ? '...' : ''}</p>
+                    ${hasMoreTracks ? `<button class="voir-plus-btn" onclick="openArtistModal('${artist.name.replace(/'/g, "\\'")}')">Voir plus</button>` : ''}
+                </div>
+            `;
+        }).join('');
     }
     
     updateArdentesArtistsList();
@@ -215,4 +221,84 @@ function showError(message) {
     errorDiv.textContent = message;
     document.querySelector('.container').insertBefore(errorDiv, document.querySelector('main'));
     setTimeout(() => errorDiv.remove(), 5000);
+}
+
+// Ouvrir la modal d'un artiste
+function openArtistModal(artistName) {
+    const artist = matchingArtists.find(a => a.name === artistName);
+    if (!artist) return;
+    
+    const modal = document.getElementById('artistModal') || createArtistModal();
+    const modalContent = modal.querySelector('.modal-content');
+    
+    modalContent.innerHTML = `
+        <div class="modal-header">
+            <span class="modal-close" onclick="closeArtistModal()">&times;</span>
+            <div class="artist-profile">
+                <img src="https://via.placeholder.com/120x120/1DB954/FFFFFF?text=🎵" alt="${artist.name}" class="artist-image">
+                <div class="artist-details">
+                    <h2>${artist.name}</h2>
+                    <p class="artist-stats">🎵 Version publique</p>
+                    <p class="artist-genres">Artiste des Ardentes 2025</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <h3>Tes chansons likées (${artist.tracks.length})</h3>
+            <div class="tracks-list">
+                ${artist.tracks.map((item, index) => `
+                    <div class="track-item">
+                        <div class="track-number">${index + 1}</div>
+                        <img src="${item.track.album?.images?.[2]?.url || item.track.album?.images?.[0]?.url || 'https://via.placeholder.com/50x50/282828/FFFFFF?text=🎵'}" 
+                             alt="${item.track.name}" class="track-image">
+                        <div class="track-info">
+                            <div class="track-name">${item.track.name}</div>
+                            <div class="track-album">${item.track.album?.name || 'Album inconnu'}</div>
+                        </div>
+                        <div class="track-duration">${formatDuration(item.track.duration_ms)}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    modal.style.display = 'block';
+}
+
+// Créer la modal si elle n'existe pas
+function createArtistModal() {
+    const modal = document.createElement('div');
+    modal.id = 'artistModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <!-- Contenu généré dynamiquement -->
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Fermer en cliquant à l'extérieur
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeArtistModal();
+        }
+    });
+    
+    return modal;
+}
+
+// Fermer la modal
+function closeArtistModal() {
+    const modal = document.getElementById('artistModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Formater la durée (ms -> mm:ss)
+function formatDuration(ms) {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 } 

@@ -131,7 +131,7 @@ async function startAnalysis() {
         
         // Étape 3: Analyse des correspondances
         updateLoadingProgress(3);
-        matchingArtists = findMatchingArtists();
+        matchingArtists = await findMatchingArtists();
         await delay(500);
         
         // Étape 4: Recommandations
@@ -209,22 +209,22 @@ async function getAllUserTracks() {
 }
 
 // Trouver les artistes correspondants
-function findMatchingArtists() {
-    const userArtists = new Map(); // Utiliser Map pour compter les occurrences
+async function findMatchingArtists() {
+    const userArtists = new Map();
     
-    // Extraire tous les noms d'artistes des likes de l'utilisateur
+    // Compter les occurrences de chaque artiste
     userTracks.forEach(item => {
         if (item.track && item.track.artists) {
             item.track.artists.forEach(artist => {
-                const artistName = artist.name.toLowerCase();
-                userArtists.set(artistName, (userArtists.get(artistName) || 0) + 1);
+                const artistKey = artist.name.toLowerCase();
+                userArtists.set(artistKey, (userArtists.get(artistKey) || 0) + 1);
             });
         }
     });
     
-    // Chercher les correspondances avec les artistes des Ardentes
+    // Chercher les correspondances
     const matches = [];
-    ARDENTES_ARTISTS.forEach(ardentesArtist => {
+    for (const ardentesArtist of ARDENTES_ARTISTS) {
         const artistKey = ardentesArtist.toLowerCase();
         if (userArtists.has(artistKey)) {
             // Trouver les chansons de cet artiste
@@ -235,16 +235,56 @@ function findMatchingArtists() {
                 )
             );
             
-            matches.push({
-                name: ardentesArtist,
-                tracks: artistTracks.slice(0, 3),
-                playCount: userArtists.get(artistKey)
-            });
+            // Récupérer les informations de l'artiste avec sa photo
+            try {
+                const artistInfo = await getArtistInfo(ardentesArtist);
+                matches.push({
+                    name: ardentesArtist,
+                    tracks: artistTracks, // Supprimer la limitation .slice(0, 3)
+                    playCount: userArtists.get(artistKey),
+                    artistInfo: artistInfo
+                });
+            } catch (error) {
+                console.error(`Erreur récupération info artiste ${ardentesArtist}:`, error);
+                matches.push({
+                    name: ardentesArtist,
+                    tracks: artistTracks,
+                    playCount: userArtists.get(artistKey),
+                    artistInfo: null
+                });
+            }
         }
-    });
+    }
     
     // Trier par nombre de chansons
     return matches.sort((a, b) => b.playCount - a.playCount);
+}
+
+// Récupérer les informations d'un artiste (photo, followers, etc.)
+async function getArtistInfo(artistName) {
+    try {
+        // Rechercher l'artiste
+        const searchResponse = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(artistName)}&type=artist&limit=1`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        
+        if (!searchResponse.ok) {
+            throw new Error('Erreur lors de la recherche artiste');
+        }
+        
+        const searchData = await searchResponse.json();
+        
+        if (searchData.artists.items.length > 0) {
+            return searchData.artists.items[0];
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Erreur getArtistInfo:', error);
+        return null;
+    }
 }
 
 // Afficher les résultats
@@ -321,18 +361,114 @@ function displayMatchingArtists() {
     if (matchingArtists.length === 0) return;
 
     matchingArtistsGrid.innerHTML = matchingArtists.map((artist, index) => {
-        const tracksList = artist.tracks.map(item => item.track.name).slice(0, 2).join(', ');
+        const tracksList = artist.tracks.slice(0, 2).map(item => item.track.name).join(', ');
         const medal = index < 3 ? ['🥇', '🥈', '🥉'][index] : '🎵';
+        const hasMoreTracks = artist.tracks.length > 2;
         
         return `
             <div class="artist-match fade-in" style="animation-delay: ${index * 0.1}s">
                 <div class="artist-rank">${medal}</div>
                 <h4>${artist.name}</h4>
                 <p><strong>${artist.tracks.length}</strong> chanson${artist.tracks.length > 1 ? 's' : ''} dans tes likes</p>
-                <p class="track-list">${tracksList}${artist.tracks.length > 2 ? '...' : ''}</p>
+                <p class="track-list">${tracksList}${hasMoreTracks ? '...' : ''}</p>
+                ${hasMoreTracks ? `<button class="voir-plus-btn" onclick="openArtistModal('${artist.name.replace(/'/g, "\\'")}')">Voir plus</button>` : ''}
             </div>
         `;
     }).join('');
+}
+
+// Ouvrir la modal d'un artiste
+function openArtistModal(artistName) {
+    const artist = matchingArtists.find(a => a.name === artistName);
+    if (!artist) return;
+    
+    const modal = document.getElementById('artistModal') || createArtistModal();
+    const modalContent = modal.querySelector('.modal-content');
+    
+    const artistImage = artist.artistInfo?.images?.[0]?.url || 'https://via.placeholder.com/300x300/1DB954/FFFFFF?text=🎵';
+    const followers = artist.artistInfo?.followers?.total ? formatNumber(artist.artistInfo.followers.total) : 'N/A';
+    const genres = artist.artistInfo?.genres?.slice(0, 3).join(', ') || 'Genres non disponibles';
+    
+    modalContent.innerHTML = `
+        <div class="modal-header">
+            <span class="modal-close" onclick="closeArtistModal()">&times;</span>
+            <div class="artist-profile">
+                <img src="${artistImage}" alt="${artist.name}" class="artist-image">
+                <div class="artist-details">
+                    <h2>${artist.name}</h2>
+                    <p class="artist-stats">👥 ${followers} followers</p>
+                    <p class="artist-genres">🎵 ${genres}</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <h3>Tes chansons likées (${artist.tracks.length})</h3>
+            <div class="tracks-list">
+                ${artist.tracks.map((item, index) => `
+                    <div class="track-item">
+                        <div class="track-number">${index + 1}</div>
+                        <img src="${item.track.album?.images?.[2]?.url || item.track.album?.images?.[0]?.url || 'https://via.placeholder.com/64x64/282828/FFFFFF?text=🎵'}" 
+                             alt="${item.track.name}" class="track-image">
+                        <div class="track-info">
+                            <div class="track-name">${item.track.name}</div>
+                            <div class="track-album">${item.track.album?.name || 'Album inconnu'}</div>
+                        </div>
+                        <div class="track-duration">${formatDuration(item.track.duration_ms)}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    modal.style.display = 'block';
+}
+
+// Créer la modal si elle n'existe pas
+function createArtistModal() {
+    const modal = document.createElement('div');
+    modal.id = 'artistModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <!-- Contenu généré dynamiquement -->
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Fermer en cliquant à l'extérieur
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeArtistModal();
+        }
+    });
+    
+    return modal;
+}
+
+// Fermer la modal
+function closeArtistModal() {
+    const modal = document.getElementById('artistModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Formater les nombres (ex: 1234567 -> 1.2M)
+function formatNumber(num) {
+    if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+}
+
+// Formater la durée (ms -> mm:ss)
+function formatDuration(ms) {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 // Afficher les recommandations
@@ -377,8 +513,9 @@ function displayAllArdentesArtists() {
 
 // Partager les résultats
 function shareResults() {
+    const topArtists = matchingArtists.slice(0, 3).map(a => a.name).join(', ');
     const text = matchingArtists.length > 0 
-        ? `🎵 J'ai trouvé ${matchingArtists.length} artistes des Ardentes 2025 dans mes likes Spotify ! Mes tops: ${matchingArtists.slice(0, 3).map(a => a.name).join(', ')} 🔥`
+        ? `🎵 J'ai trouvé ${matchingArtists.length} artistes des Ardentes 2025 dans mes likes Spotify ! Mes tops: ${topArtists} 🔥`
         : `🎵 J'ai analysé mes likes Spotify pour les Ardentes 2025 ! Temps de découvrir de nouveaux artistes 🚀`;
     
     const url = window.location.href;
