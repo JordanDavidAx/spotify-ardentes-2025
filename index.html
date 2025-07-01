@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify x Ardentes 2025</title>
+    <script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async></script>
     <style>
         :root {
             --spotify-green: #1DB954;
@@ -591,6 +592,107 @@
             min-width: 40px;
             text-align: right;
         }
+
+        .platform-selector {
+            margin-bottom: 20px;
+        }
+
+        .platform-selector h3 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .platform-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .platform-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-light);
+            min-width: 200px;
+        }
+
+        .platform-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .platform-btn.active {
+            background: linear-gradient(45deg, var(--spotify-green), var(--ardentes-orange));
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
+        }
+
+        .platform-btn span {
+            font-size: 1.5rem;
+        }
+
+        .platform-btn div {
+            text-align: left;
+        }
+
+        .platform-btn strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+        }
+
+        .platform-btn small {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .apple-help {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--ardentes-orange);
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .apple-help h3 {
+            color: var(--ardentes-orange);
+            margin-bottom: 15px;
+        }
+
+        .apple-help a {
+            color: var(--spotify-green);
+            text-decoration: none;
+        }
+
+        .apple-help a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .platform-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .platform-btn {
+                min-width: 280px;
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .platform-btn div {
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -606,25 +708,62 @@
             <div id="setup-section" class="section">
                 <div class="card">
                     <h2>🎵 Découvre tes artistes des Ardentes 2025</h2>
-                    <p>Connecte-toi à Spotify pour analyser tes likes et voir quels artistes du festival tu écoutes déjà !</p>
+                    <p>Connecte-toi à ta plateforme musicale pour analyser tes likes et voir quels artistes du festival tu écoutes déjà !</p>
+                    
+                    <!-- Sélecteur de plateforme -->
+                    <div class="platform-selector">
+                        <h3>📱 Choisis ta plateforme :</h3>
+                        <div class="platform-buttons">
+                            <button id="spotify-btn" class="platform-btn active" onclick="selectPlatform('spotify')">
+                                <span>🎧</span>
+                                <div>
+                                    <strong>Spotify</strong>
+                                    <small>Connecte tes likes Spotify</small>
+                                </div>
+                            </button>
+                            <button id="apple-btn" class="platform-btn" onclick="selectPlatform('apple')">
+                                <span>🍎</span>
+                                <div>
+                                    <strong>Apple Music</strong>
+                                    <small>Connecte ta bibliothèque Apple Music</small>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                     
                     <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; margin: 20px 0;">
                         <h3>📊 Ce que nous allons analyser :</h3>
                         <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
-                            <li>Tes likes Spotify (maximum 1000)</li>
+                            <li id="platform-info">Tes likes Spotify (maximum 1000)</li>
                             <li>Comparaison avec 160+ artistes des Ardentes 2025</li>
                             <li>Statistiques personnalisées avec vraie lineup</li>
                         </ul>
                     </div>
 
                     <button id="connect-btn" class="spotify-btn">
-                        <span>🎧</span>
-                        Se connecter avec Spotify
+                        <span id="connect-icon">🎧</span>
+                        <span id="connect-text">Se connecter avec Spotify</span>
                     </button>
                     
                     <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted);">
                         🔒 Tes données restent privées et ne sont jamais sauvegardées<br>
-                        ✅ Application pré-configurée - connexion directe !
+                        <span id="config-status">✅ Spotify pré-configuré - connexion directe !</span>
+                    </div>
+
+                    <!-- Section d'aide Apple Music -->
+                    <div id="apple-help" class="apple-help hidden">
+                        <h3>⚠️ Configuration Apple Music requise</h3>
+                        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; margin: 20px 0; text-align: left;">
+                            <p><strong>Pour utiliser Apple Music, tu as besoin d'un Developer Token :</strong></p>
+                            <ol style="margin: 15px 0; padding-left: 20px;">
+                                <li>Créer un compte <a href="https://developer.apple.com" target="_blank" style="color: var(--spotify-green);">Apple Developer</a></li>
+                                <li>Générer un <strong>MusicKit Identifier</strong></li>
+                                <li>Créer une <strong>Private Key</strong> (.p8)</li>
+                                <li>Générer un <strong>JWT Developer Token</strong></li>
+                                <li>Remplacer la valeur dans le code</li>
+                            </ol>
+                            <p>📖 <a href="https://developer.apple.com/documentation/applemusicapi/getting_keys_and_creating_tokens" target="_blank" style="color: var(--spotify-green);">Guide Apple Music API</a></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -667,6 +806,18 @@
             REDIRECT_URI: window.location.href.split('?')[0].split('#')[0],
             SCOPES: 'user-library-read user-read-private'
         };
+
+        // Configuration Apple Music
+        const APPLE_MUSIC_CONFIG = {
+            // ⚠️ IMPORTANT: Remplace par ton Developer Token Apple Music
+            DEVELOPER_TOKEN: 'REMPLACE_PAR_TON_DEVELOPER_TOKEN_APPLE_MUSIC',
+            APP_NAME: 'Spotify x Ardentes 2025',
+            APP_BUILD: '1.0.0'
+        };
+
+        // Variables globales
+        let selectedPlatform = 'spotify'; // 'spotify' ou 'apple'
+        let musicKit = null;
 
         // Fonctions utilitaires pour PKCE
         function generateCodeVerifier() {
@@ -877,9 +1028,9 @@
 
             logDebug('👋 Prêt pour la connexion');
 
-            // Bouton de connexion
+            // Bouton de connexion universel
             connectBtn.addEventListener('click', () => {
-                loginToSpotify();
+                handleConnect();
             });
 
             // Bouton reset
@@ -933,8 +1084,20 @@
             }
         }
 
-        async function startAnalysis() {
-            logDebug('📊 Démarrage de l\'analyse');
+        async function handleConnect() {
+            if (selectedPlatform === 'spotify') {
+                await connectToSpotify();
+            } else if (selectedPlatform === 'apple') {
+                await connectAppleMusic();
+            }
+        }
+
+        async function connectToSpotify() {
+            await loginToSpotify();
+        }
+
+        async function startSpotifyAnalysis() {
+            logDebug('📊 Démarrage analyse Spotify');
             showSection('loading');
             
             try {
@@ -950,14 +1113,19 @@
                 logDebug('4️⃣ Affichage des résultats', `${matchingArtists.length} artistes trouvés`);
                 displayResults();
                 
-                showMessage('✅ Analyse terminée avec succès !');
-                logDebug('🎉 Analyse terminée avec succès');
+                showMessage('✅ Analyse Spotify terminée avec succès !');
+                logDebug('🎉 Analyse Spotify terminée avec succès');
                 
             } catch (error) {
-                logDebug('❌ Erreur lors de l\'analyse', error);
-                showError('Erreur lors de l\'analyse: ' + error.message);
+                logDebug('❌ Erreur lors de l\'analyse Spotify', error);
+                showError('Erreur lors de l\'analyse Spotify: ' + error.message);
                 showSection('setup');
             }
+        }
+
+        // Alias pour compatibilité avec le code existant
+        async function startAnalysis() {
+            return await startSpotifyAnalysis();
         }
 
         async function getUserProfile() {
@@ -1166,8 +1334,6 @@
             }
         }
 
-
-
         function showSection(section) {
             [setupSection, loadingSection, resultsSection].forEach(el => {
                 el.classList.add('hidden');
@@ -1287,6 +1453,246 @@
             const minutes = Math.floor(ms / 60000);
             const seconds = Math.floor((ms % 60000) / 1000);
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function selectPlatform(platform) {
+            selectedPlatform = platform;
+            updatePlatformInfo();
+            updatePlatformUI();
+        }
+
+        function updatePlatformInfo() {
+            const platformInfo = document.getElementById('platform-info');
+            const connectIcon = document.getElementById('connect-icon');
+            const connectText = document.getElementById('connect-text');
+            const configStatus = document.getElementById('config-status');
+            const appleHelp = document.getElementById('apple-help');
+            
+            if (selectedPlatform === 'spotify') {
+                platformInfo.textContent = 'Tes likes Spotify (maximum 1000)';
+                connectIcon.textContent = '🎧';
+                connectText.textContent = 'Se connecter avec Spotify';
+                configStatus.innerHTML = '✅ Spotify pré-configuré - connexion directe !';
+                if (appleHelp) appleHelp.classList.add('hidden');
+            } else if (selectedPlatform === 'apple') {
+                platformInfo.textContent = 'Ta bibliothèque Apple Music (likes et ajouts)';
+                connectIcon.textContent = '🍎';
+                connectText.textContent = 'Se connecter avec Apple Music';
+                if (APPLE_MUSIC_CONFIG.DEVELOPER_TOKEN === 'REMPLACE_PAR_TON_DEVELOPER_TOKEN_APPLE_MUSIC') {
+                    configStatus.innerHTML = '⚠️ Apple Music nécessite une configuration développeur';
+                    if (appleHelp) appleHelp.classList.remove('hidden');
+                } else {
+                    configStatus.innerHTML = '✅ Apple Music configuré - connexion directe !';
+                    if (appleHelp) appleHelp.classList.add('hidden');
+                }
+            }
+        }
+
+        function updatePlatformUI() {
+            // Mettre à jour les boutons de plateforme
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`${selectedPlatform}-btn`).classList.add('active');
+        }
+
+        // ===== FONCTIONS APPLE MUSIC =====
+
+        async function initializeAppleMusic() {
+            try {
+                logDebug('🍎 Initialisation Apple Music MusicKit');
+                
+                if (APPLE_MUSIC_CONFIG.DEVELOPER_TOKEN === 'REMPLACE_PAR_TON_DEVELOPER_TOKEN_APPLE_MUSIC') {
+                    throw new Error('Developer Token Apple Music non configuré');
+                }
+
+                await MusicKit.configure({
+                    developerToken: APPLE_MUSIC_CONFIG.DEVELOPER_TOKEN,
+                    app: {
+                        name: APPLE_MUSIC_CONFIG.APP_NAME,
+                        build: APPLE_MUSIC_CONFIG.APP_BUILD
+                    }
+                });
+
+                musicKit = MusicKit.getInstance();
+                logDebug('✅ Apple Music MusicKit initialisé');
+                return true;
+            } catch (error) {
+                logDebug('❌ Erreur initialisation Apple Music', error.message);
+                return false;
+            }
+        }
+
+        async function connectAppleMusic() {
+            try {
+                logDebug('🍎 Connexion Apple Music');
+                
+                const initialized = await initializeAppleMusic();
+                if (!initialized) {
+                    throw new Error('Impossible d\'initialiser Apple Music');
+                }
+
+                const authorization = await musicKit.authorize();
+                logDebug('✅ Autorisation Apple Music obtenue');
+                
+                await startAppleMusicAnalysis();
+            } catch (error) {
+                logDebug('❌ Erreur connexion Apple Music', error.message);
+                showError('Erreur de connexion Apple Music: ' + error.message);
+                showSection('setup');
+            }
+        }
+
+        async function startAppleMusicAnalysis() {
+            showSection('loading');
+            logDebug('📊 Démarrage analyse Apple Music');
+            
+            try {
+                // Récupérer le profil utilisateur
+                userProfile = await getAppleMusicProfile();
+                
+                // Récupérer les morceaux de la bibliothèque
+                userTracks = await getAllAppleMusicTracks();
+                
+                // Analyser les correspondances (même fonction que Spotify)
+                matchingArtists = await findMatchingArtistsAppleMusic();
+                
+                // Afficher les résultats
+                displayResults();
+                
+                logDebug('🎉 Analyse Apple Music terminée avec succès');
+            } catch (error) {
+                logDebug('❌ Erreur analyse Apple Music', error.message);
+                showError('Erreur lors de l\'analyse Apple Music: ' + error.message);
+                showSection('setup');
+            }
+        }
+
+        async function getAppleMusicProfile() {
+            logDebug('👤 Récupération profil Apple Music');
+            
+            // Apple Music n'a pas de profil public comme Spotify
+            // On simule un profil basé sur l'état de connexion
+            const profile = {
+                display_name: 'Utilisateur Apple Music',
+                id: 'apple_music_user',
+                images: []
+            };
+            
+            logDebug('✅ Profil Apple Music simulé', { user: profile.display_name });
+            return profile;
+        }
+
+        async function getAllAppleMusicTracks() {
+            logDebug('🎵 Récupération bibliothèque Apple Music');
+            
+            try {
+                let allTracks = [];
+                let offset = 0;
+                const limit = 100;
+                let hasMore = true;
+                let pageCount = 0;
+
+                while (hasMore && allTracks.length < 1000) {
+                    pageCount++;
+                    logDebug(`📄 Page ${pageCount} Apple Music`, `Offset: ${offset}, Limit: ${limit}`);
+
+                    // Récupérer les morceaux de la bibliothèque
+                    const response = await musicKit.api.library.songs(null, { 
+                        offset: offset, 
+                        limit: limit 
+                    });
+
+                    logDebug(`Réponse API Apple Music page ${pageCount}`, { 
+                        itemsReceived: response.data?.length || 0
+                    });
+
+                    if (response.data && response.data.length > 0) {
+                        // Convertir le format Apple Music vers le format Spotify pour compatibilité
+                        const convertedTracks = response.data.map(song => ({
+                            track: {
+                                name: song.attributes.name,
+                                artists: song.attributes.artistName ? [{ name: song.attributes.artistName }] : [],
+                                album: {
+                                    name: song.attributes.albumName,
+                                    images: song.attributes.artwork ? [{
+                                        url: song.attributes.artwork.url.replace('{w}', '300').replace('{h}', '300')
+                                    }] : []
+                                },
+                                duration_ms: song.attributes.durationInMillis || 0
+                            }
+                        }));
+
+                        allTracks = allTracks.concat(convertedTracks);
+                        offset += limit;
+
+                        logDebug(`✅ Page ${pageCount} Apple Music récupérée`, { 
+                            itemsThisPage: convertedTracks.length,
+                            totalSoFar: allTracks.length
+                        });
+                    } else {
+                        hasMore = false;
+                    }
+
+                    // Délai pour éviter le rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+
+                logDebug('🎵 Récupération Apple Music terminée', { 
+                    totalTracks: allTracks.length,
+                    pages: pageCount 
+                });
+
+                return allTracks;
+            } catch (error) {
+                logDebug('❌ Erreur récupération Apple Music', error.message);
+                throw new Error('Impossible de récupérer la bibliothèque Apple Music');
+            }
+        }
+
+        async function findMatchingArtistsAppleMusic() {
+            logDebug('🔍 Analyse correspondances Apple Music');
+            
+            const userArtists = new Set();
+            
+            // Extraire tous les artistes de la bibliothèque
+            userTracks.forEach(item => {
+                if (item.track?.artists) {
+                    item.track.artists.forEach(artist => {
+                        userArtists.add(artist.name.toLowerCase());
+                    });
+                }
+            });
+
+            logDebug('Artistes uniques Apple Music', { count: userArtists.size });
+            logDebug('Artistes des Ardentes à chercher', { count: ARDENTES_ARTISTS.length });
+
+            // Chercher les correspondances (même logique que Spotify)
+            const matches = ARDENTES_ARTISTS.filter(artist => 
+                userArtists.has(artist.toLowerCase())
+            ).map(artist => {
+                const matchingTracks = userTracks.filter(item => 
+                    item.track?.artists?.some(a => 
+                        a.name.toLowerCase() === artist.toLowerCase()
+                    )
+                );
+
+                console.log(`🎤 DEBUG: ${artist} - Chansons Apple Music trouvées: ${matchingTracks.length}`);
+                console.log(`📝 DEBUG: Détail Apple Music ${artist}:`, matchingTracks.map(item => item.track.name));
+                logDebug(`✅ Match Apple Music: ${artist}`, { tracks: matchingTracks.length });
+                
+                return {
+                    name: artist,
+                    tracks: matchingTracks
+                };
+            });
+
+            logDebug('🎯 Résultat final Apple Music', { 
+                matchingArtists: matches.length,
+                artists: matches.map(m => m.name)
+            });
+
+            return matches;
         }
     </script>
 </body>
