@@ -1047,21 +1047,35 @@
             debugDiv.id = 'debug-log';
             debugDiv.style.cssText = `
                 position: fixed; bottom: 10px; right: 10px; 
-                width: 350px; max-height: 250px; overflow-y: auto;
-                background: rgba(0,0,0,0.9); border-radius: 10px; 
+                width: 400px; max-height: 300px; overflow-y: auto;
+                background: rgba(0,0,0,0.95); border-radius: 10px; 
                 padding: 15px; font-family: monospace; font-size: 0.7rem;
                 z-index: 1000; border: 2px solid #1DB954;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             `;
             
-            // Ajouter un titre et bouton clear
+            // Ajouter un titre et boutons de test
             debugDiv.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #1DB954;">
                     <span style="color: #1DB954; font-weight: bold;">🎵 Debug Spotify</span>
-                    <button onclick="document.getElementById('debug-log').innerHTML = this.parentElement.outerHTML" 
-                            style="background: #FF6B35; border: none; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.6rem; cursor: pointer;">
-                        Clear
-                    </button>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="testConnectButton()" 
+                                style="background: #1DB954; border: none; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.6rem; cursor: pointer;">
+                            Test Btn
+                        </button>
+                        <button onclick="testAllElements()" 
+                                style="background: #FF6B35; border: none; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.6rem; cursor: pointer;">
+                            Test All
+                        </button>
+                        <button onclick="forceConnect()" 
+                                style="background: #E74C3C; border: none; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.6rem; cursor: pointer;">
+                            Force
+                        </button>
+                        <button onclick="document.getElementById('debug-log').querySelector('#debug-content').innerHTML = ''" 
+                                style="background: #666; border: none; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.6rem; cursor: pointer;">
+                            Clear
+                        </button>
+                    </div>
                 </div>
                 <div id="debug-content"></div>
             `;
@@ -1110,13 +1124,8 @@
         let userTracks = [];
         let matchingArtists = [];
 
-        // Éléments DOM
-        const setupSection = document.getElementById('setup-section');
-        const loadingSection = document.getElementById('loading-section');
-        const resultsSection = document.getElementById('results-section');
-        const connectBtn = document.getElementById('connect-btn');
-        const resetBtn = document.getElementById('reset-btn');
-        const shareBtn = document.getElementById('share-btn');
+        // Éléments DOM (déclarés mais initialisés dans DOMContentLoaded)
+        let setupSection, loadingSection, resultsSection, connectBtn, resetBtn, shareBtn;
 
         // Fonction pour échanger le code d'autorisation contre un token
         async function exchangeCodeForToken(authCode) {
@@ -1179,14 +1188,25 @@
             logDebug('🎵 Application démarrée');
 
             // Initialiser les éléments DOM
+            logDebug('🔧 Initialisation des éléments DOM...');
             setupSection = document.getElementById('setup-section');
             loadingSection = document.getElementById('loading-section');
             resultsSection = document.getElementById('results-section');
             connectBtn = document.getElementById('connect-btn');
             shareBtn = document.getElementById('share-btn');
             resetBtn = document.getElementById('reset-btn');
+            
+            logDebug('Éléments DOM trouvés', {
+                setupSection: !!setupSection,
+                loadingSection: !!loadingSection,
+                resultsSection: !!resultsSection,
+                connectBtn: !!connectBtn,
+                shareBtn: !!shareBtn,
+                resetBtn: !!resetBtn
+            });
 
             // Charger les configurations sauvegardées
+            logDebug('📥 Chargement des configurations...');
             loadConfigs();
 
             // Vérifier si on revient d'une autorisation Spotify
@@ -1209,53 +1229,110 @@
             }
 
             // Gestionnaires d'événements
-            connectBtn.addEventListener('click', handleConnect);
-            shareBtn.addEventListener('click', shareResults);
-            resetBtn.addEventListener('click', resetApp);
+            logDebug('🔗 Configuration des gestionnaires d\'événements...');
+            
+            // Connexion avec plusieurs méthodes
+            const connectButton = document.getElementById('connect-btn');
+            if (connectButton) {
+                // Méthode 1: addEventListener
+                connectButton.addEventListener('click', (event) => {
+                    logDebug('🔘 Click détecté (addEventListener)');
+                    event.preventDefault();
+                    handleConnect();
+                });
+                
+                // Méthode 2: onclick direct (backup)
+                connectButton.onclick = (event) => {
+                    logDebug('🔘 Click détecté (onclick)');
+                    event.preventDefault();
+                    handleConnect();
+                };
+                
+                logDebug('✅ Gestionnaire connectBtn configuré (double méthode)');
+            } else {
+                logDebug('❌ connectBtn non trouvé !');
+            }
+            
+            // Autres boutons
+            if (shareBtn) {
+                shareBtn.addEventListener('click', shareResults);
+                logDebug('✅ Gestionnaire shareBtn configuré');
+            }
+            
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetApp);
+                logDebug('✅ Gestionnaire resetBtn configuré');
+            }
+            
+            // Test automatique après 3 secondes
+            setTimeout(() => {
+                logDebug('🧪 Test automatique des éléments après 3 secondes');
+                testAllElements();
+            }, 3000);
             
             // Initialiser l'interface
+            logDebug('🎨 Initialisation de l\'interface...');
             updatePlatformInfo();
             updatePlatformUI();
             
-            logDebug('👋 Application prête');
+            logDebug('👋 Application prête !');
         });
 
         async function handleConnect() {
+            logDebug('🔘 Bouton de connexion cliqué !');
+            logDebug('Platform sélectionnée', selectedPlatform);
+            
             if (selectedPlatform === 'spotify') {
-                if (!isSpotifyConfigured()) {
+                logDebug('🎧 Vérification configuration Spotify...');
+                const isConfigured = isSpotifyConfigured();
+                logDebug('Configuration Spotify', { isConfigured, clientId: getSpotifyConfig().CLIENT_ID?.substring(0, 10) + '...' });
+                
+                if (!isConfigured) {
+                    logDebug('❌ Configuration Spotify manquante');
                     showError('Veuillez d\'abord configurer votre Client ID Spotify');
                     return;
                 }
+                logDebug('✅ Configuration Spotify OK, connexion...');
                 await connectToSpotify();
             } else if (selectedPlatform === 'apple') {
-                if (!isAppleMusicConfigured()) {
+                logDebug('🍎 Vérification configuration Apple Music...');
+                const isConfigured = isAppleMusicConfigured();
+                logDebug('Configuration Apple Music', { isConfigured });
+                
+                if (!isConfigured) {
+                    logDebug('❌ Configuration Apple Music manquante');
                     showError('Veuillez d\'abord configurer votre Developer Token Apple Music');
                     return;
                 }
+                logDebug('✅ Configuration Apple Music OK, connexion...');
                 await connectAppleMusic();
             }
         }
 
         async function connectToSpotify() {
+            logDebug('🚀 Début connexion Spotify');
             await loginToSpotify();
         }
 
         async function loginToSpotify() {
             try {
+                logDebug('🚀 Démarrage de l\'authentification Spotify');
+                
                 const CONFIG = getSpotifyConfig();
                 
                 if (!CONFIG.CLIENT_ID) {
+                    logDebug('❌ Client ID manquant dans CONFIG');
                     throw new Error('Client ID Spotify non configuré');
                 }
                 
-                logDebug('🚀 Démarrage de l\'authentification Spotify');
-                logDebug('Configuration', {
+                logDebug('Configuration chargée', {
                     CLIENT_ID: CONFIG.CLIENT_ID.substring(0, 10) + '...',
                     REDIRECT_URI: CONFIG.REDIRECT_URI,
                     SCOPES: CONFIG.SCOPES
                 });
 
                 // Générer code verifier et challenge pour PKCE
+                logDebug('🔐 Génération codes PKCE...');
                 const codeVerifier = generateCodeVerifier();
                 const codeChallenge = await generateCodeChallenge(codeVerifier);
                 
@@ -1277,11 +1354,21 @@
                     `code_challenge=${codeChallenge}&` +
                     `show_dialog=true`;
                 
-                logDebug('Redirection vers Spotify', { authUrl });
-                window.location.href = authUrl;
+                logDebug('🌐 URL d\'autorisation construite', { 
+                    url: authUrl.substring(0, 100) + '...',
+                    urlLength: authUrl.length
+                });
+                
+                logDebug('🔄 Redirection vers Spotify dans 2 secondes...');
+                
+                // Petit délai pour voir les logs
+                setTimeout(() => {
+                    logDebug('➡️ Redirection maintenant !');
+                    window.location.href = authUrl;
+                }, 2000);
                 
             } catch (error) {
-                logDebug('❌ Erreur lors de l\'authentification', error);
+                logDebug('❌ Erreur lors de l\'authentification', error.message);
                 showError('Erreur lors de l\'authentification: ' + error.message);
             }
         }
@@ -1659,6 +1746,9 @@
             const appleHelp = document.getElementById('apple-help');
             const spotifyConfig = document.getElementById('spotify-config');
             const appleConfig = document.getElementById('apple-config');
+            const connectBtn = document.getElementById('connect-btn');
+            
+            logDebug('🔄 Mise à jour de l\'interface pour', selectedPlatform);
             
             if (selectedPlatform === 'spotify') {
                 platformInfo.textContent = 'Tes likes Spotify (maximum 1000)';
@@ -1671,17 +1761,32 @@
                 if (appleHelp) appleHelp.classList.add('hidden');
                 
                 // Vérifier et mettre à jour l'état de la configuration
-                if (isSpotifyConfigured()) {
+                const isConfigured = isSpotifyConfigured();
+                logDebug('État configuration Spotify', { isConfigured });
+                
+                if (isConfigured) {
                     configStatus.innerHTML = '✅ Spotify configuré - connexion disponible !';
                     if (spotifyConfig) {
                         spotifyConfig.classList.add('valid');
                         spotifyConfig.classList.remove('invalid');
+                    }
+                    // Activer le bouton
+                    if (connectBtn) {
+                        connectBtn.disabled = false;
+                        connectBtn.style.opacity = '1';
+                        connectBtn.style.cursor = 'pointer';
                     }
                 } else {
                     configStatus.innerHTML = '⚠️ Configuration Spotify requise';
                     if (spotifyConfig) {
                         spotifyConfig.classList.add('invalid');
                         spotifyConfig.classList.remove('valid');
+                    }
+                    // Désactiver visuellement le bouton (mais garde cliquable pour tests)
+                    if (connectBtn) {
+                        connectBtn.disabled = false;
+                        connectBtn.style.opacity = '0.6';
+                        connectBtn.style.cursor = 'pointer';
                     }
                 }
             } else if (selectedPlatform === 'apple') {
@@ -1694,12 +1799,21 @@
                 if (appleConfig) appleConfig.classList.remove('hidden');
                 
                 // Vérifier et mettre à jour l'état de la configuration
-                if (isAppleMusicConfigured()) {
+                const isConfigured = isAppleMusicConfigured();
+                logDebug('État configuration Apple Music', { isConfigured });
+                
+                if (isConfigured) {
                     configStatus.innerHTML = '✅ Apple Music configuré - connexion disponible !';
                     if (appleHelp) appleHelp.classList.add('hidden');
                     if (appleConfig) {
                         appleConfig.classList.add('valid');
                         appleConfig.classList.remove('invalid');
+                    }
+                    // Activer le bouton
+                    if (connectBtn) {
+                        connectBtn.disabled = false;
+                        connectBtn.style.opacity = '1';
+                        connectBtn.style.cursor = 'pointer';
                     }
                 } else {
                     configStatus.innerHTML = '⚠️ Configuration Apple Music requise';
@@ -1708,8 +1822,16 @@
                         appleConfig.classList.add('invalid');
                         appleConfig.classList.remove('valid');
                     }
+                    // Désactiver visuellement le bouton (mais garde cliquable pour tests)
+                    if (connectBtn) {
+                        connectBtn.disabled = false;
+                        connectBtn.style.opacity = '0.6';
+                        connectBtn.style.cursor = 'pointer';
+                    }
                 }
             }
+            
+            logDebug('✅ Interface mise à jour');
         }
 
         function updatePlatformUI() {
@@ -2083,6 +2205,64 @@
             showSection('setup');
             
             logDebug('🔄 Application réinitialisée');
+        }
+
+        // ===== FONCTIONS DE TEST ET DEBUG =====
+        
+        function testConnectButton() {
+            logDebug('🧪 TEST: Fonction de test du bouton de connexion');
+            
+            const btn = document.getElementById('connect-btn');
+            logDebug('Bouton trouvé', { 
+                exists: !!btn, 
+                id: btn?.id, 
+                className: btn?.className,
+                innerHTML: btn?.innerHTML?.substring(0, 50) + '...'
+            });
+            
+            if (btn) {
+                logDebug('🔘 Simulation d\'un clic...');
+                handleConnect();
+            } else {
+                logDebug('❌ Bouton connect-btn non trouvé !');
+            }
+        }
+        
+        function testAllElements() {
+            logDebug('🧪 TEST: Vérification de tous les éléments');
+            
+            const elements = {
+                'setup-section': document.getElementById('setup-section'),
+                'loading-section': document.getElementById('loading-section'),
+                'results-section': document.getElementById('results-section'),
+                'connect-btn': document.getElementById('connect-btn'),
+                'spotify-btn': document.getElementById('spotify-btn'),
+                'apple-btn': document.getElementById('apple-btn'),
+                'spotify-client-id': document.getElementById('spotify-client-id'),
+                'spotify-config': document.getElementById('spotify-config'),
+                'apple-config': document.getElementById('apple-config')
+            };
+            
+            Object.entries(elements).forEach(([name, element]) => {
+                logDebug(`Element ${name}`, { 
+                    exists: !!element, 
+                    visible: element?.style?.display !== 'none',
+                    hasClass: element?.className
+                });
+            });
+            
+            logDebug('Configuration actuelle', {
+                selectedPlatform: selectedPlatform,
+                spotifyConfigured: isSpotifyConfigured(),
+                appleConfigured: isAppleMusicConfigured(),
+                spotifyClientId: localStorage.getItem('spotify_client_id')?.substring(0, 10) + '...'
+            });
+        }
+        
+        // Fonction pour forcer la connexion (test)
+        function forceConnect() {
+            logDebug('🚀 FORCE: Connexion forcée !');
+            handleConnect();
         }
     </script>
 </body>
