@@ -210,6 +210,7 @@ async function getAllUserTracks() {
 
 // Trouver les artistes correspondants
 async function findMatchingArtists() {
+    console.log('🔍 DEBUG: Début de findMatchingArtists (version publique)');
     const userArtists = new Map();
     
     // Compter les occurrences de chaque artiste
@@ -221,6 +222,8 @@ async function findMatchingArtists() {
             });
         }
     });
+    
+    console.log('🎵 DEBUG: Artistes uniques extraits des likes:', userArtists.size);
     
     // Chercher les correspondances
     const matches = [];
@@ -235,29 +238,36 @@ async function findMatchingArtists() {
                 )
             );
             
+            console.log(`🎤 DEBUG: ${ardentesArtist} - Chansons trouvées AVANT limitation: ${artistTracks.length}`);
+            console.log(`📝 DEBUG: Détail des chansons de ${ardentesArtist}:`, artistTracks.map(item => item.track.name));
+            
             // Récupérer les informations de l'artiste avec sa photo
             try {
                 const artistInfo = await getArtistInfo(ardentesArtist);
                 matches.push({
                     name: ardentesArtist,
-                    tracks: artistTracks, // Supprimer la limitation .slice(0, 3)
+                    tracks: artistTracks, // ✅ LIMITATION SUPPRIMÉE - TOUTES LES CHANSONS
                     playCount: userArtists.get(artistKey),
                     artistInfo: artistInfo
                 });
+                console.log(`✅ DEBUG: ${ardentesArtist} ajouté avec ${artistTracks.length} chansons (LIMITE SUPPRIMÉE)`);
             } catch (error) {
                 console.error(`Erreur récupération info artiste ${ardentesArtist}:`, error);
                 matches.push({
                     name: ardentesArtist,
-                    tracks: artistTracks,
+                    tracks: artistTracks, // ✅ LIMITATION SUPPRIMÉE - TOUTES LES CHANSONS
                     playCount: userArtists.get(artistKey),
                     artistInfo: null
                 });
+                console.log(`⚠️ DEBUG: ${ardentesArtist} ajouté avec ${artistTracks.length} chansons (LIMITE SUPPRIMÉE, sans info artiste)`);
             }
         }
     }
     
     // Trier par nombre de chansons
-    return matches.sort((a, b) => b.playCount - a.playCount);
+    const sortedMatches = matches.sort((a, b) => b.playCount - a.playCount);
+    console.log('🎯 DEBUG: Résultat final findMatchingArtists:', sortedMatches.map(m => ({ name: m.name, tracks: m.tracks.length })));
+    return sortedMatches;
 }
 
 // Récupérer les informations d'un artiste (photo, followers, etc.)
@@ -356,6 +366,9 @@ function displayStats() {
 
 // Afficher les artistes correspondants
 function displayMatchingArtists() {
+    console.log('🎨 DEBUG: Début de displayMatchingArtists (version publique)');
+    console.log('📊 DEBUG: matchingArtists reçu:', matchingArtists.map(a => ({ name: a.name, tracks: a.tracks.length })));
+    
     const matchingArtistsGrid = document.getElementById('matching-artists');
     
     if (matchingArtists.length === 0) return;
@@ -364,6 +377,8 @@ function displayMatchingArtists() {
         const tracksList = artist.tracks.slice(0, 2).map(item => item.track.name).join(', ');
         const medal = index < 3 ? ['🥇', '🥈', '🥉'][index] : '🎵';
         const hasMoreTracks = artist.tracks.length > 2;
+        
+        console.log(`🎤 DEBUG: Affichage ${artist.name} - ${artist.tracks.length} chansons, hasMoreTracks: ${hasMoreTracks}`);
         
         return `
             <div class="artist-match fade-in" style="animation-delay: ${index * 0.1}s">
@@ -375,6 +390,8 @@ function displayMatchingArtists() {
             </div>
         `;
     }).join('');
+    
+    console.log('✅ DEBUG: Affichage terminé (version publique)');
 }
 
 // Ouvrir la modal d'un artiste

@@ -142,6 +142,7 @@ async function getAllUserTracks() {
 
 // Trouver les artistes correspondants
 async function findMatchingArtists() {
+    console.log('🔍 DEBUG: Début de findMatchingArtists');
     const userArtists = new Set();
     
     // Extraire tous les noms d'artistes des likes de l'utilisateur
@@ -152,6 +153,8 @@ async function findMatchingArtists() {
             });
         }
     });
+    
+    console.log('🎵 DEBUG: Artistes uniques extraits des likes:', userArtists.size);
     
     // Chercher les correspondances avec les artistes des Ardentes
     const matches = [];
@@ -165,6 +168,9 @@ async function findMatchingArtists() {
                 )
             );
             
+            console.log(`🎤 DEBUG: ${ardentesArtist} - Chansons trouvées AVANT limitation: ${artistTracks.length}`);
+            console.log(`📝 DEBUG: Détail des chansons de ${ardentesArtist}:`, artistTracks.map(item => item.track.name));
+            
             // Récupérer les informations de l'artiste avec sa photo
             try {
                 const artistInfo = await getArtistInfo(ardentesArtist);
@@ -173,6 +179,7 @@ async function findMatchingArtists() {
                     tracks: artistTracks,
                     artistInfo: artistInfo
                 });
+                console.log(`✅ DEBUG: ${ardentesArtist} ajouté avec ${artistTracks.length} chansons (LIMITE SUPPRIMÉE)`);
             } catch (error) {
                 console.error(`Erreur récupération info artiste ${ardentesArtist}:`, error);
                 matches.push({
@@ -180,10 +187,12 @@ async function findMatchingArtists() {
                     tracks: artistTracks,
                     artistInfo: null
                 });
+                console.log(`⚠️ DEBUG: ${ardentesArtist} ajouté avec ${artistTracks.length} chansons (LIMITE SUPPRIMÉE, sans info artiste)`);
             }
         }
     }
     
+    console.log('🎯 DEBUG: Résultat final findMatchingArtists:', matches.map(m => ({ name: m.name, tracks: m.tracks.length })));
     return matches;
 }
 
@@ -285,6 +294,9 @@ function displayStats() {
 
 // Afficher les artistes correspondants
 function displayMatchingArtists() {
+    console.log('🎨 DEBUG: Début de displayMatchingArtists');
+    console.log('📊 DEBUG: matchingArtists reçu:', matchingArtists.map(a => ({ name: a.name, tracks: a.tracks.length })));
+    
     const matchingArtistsGrid = document.getElementById('matching-artists');
     
     if (matchingArtists.length === 0) return;
@@ -292,6 +304,8 @@ function displayMatchingArtists() {
     matchingArtistsGrid.innerHTML = matchingArtists.map(artist => {
         const tracksList = artist.tracks.slice(0, 2).map(item => item.track.name).join(', ');
         const hasMoreTracks = artist.tracks.length > 2;
+        
+        console.log(`🎤 DEBUG: Affichage ${artist.name} - ${artist.tracks.length} chansons, hasMoreTracks: ${hasMoreTracks}`);
         
         return `
             <div class="artist-match fade-in">
@@ -302,12 +316,25 @@ function displayMatchingArtists() {
             </div>
         `;
     }).join('');
+    
+    console.log('✅ DEBUG: Affichage terminé');
 }
 
 // Ouvrir la modal d'un artiste
 function openArtistModal(artistName) {
+    console.log(`🎭 DEBUG: Ouverture modal pour ${artistName}`);
     const artist = matchingArtists.find(a => a.name === artistName);
-    if (!artist) return;
+    if (!artist) {
+        console.error(`❌ DEBUG: Artiste ${artistName} non trouvé dans matchingArtists`);
+        return;
+    }
+    
+    console.log(`📊 DEBUG: Données artiste modal:`, {
+        name: artist.name,
+        tracksCount: artist.tracks.length,
+        hasArtistInfo: !!artist.artistInfo,
+        trackNames: artist.tracks.map(t => t.track.name)
+    });
     
     const modal = document.getElementById('artistModal') || createArtistModal();
     const modalContent = modal.querySelector('.modal-content');
@@ -348,6 +375,7 @@ function openArtistModal(artistName) {
     `;
     
     modal.style.display = 'block';
+    console.log(`✅ DEBUG: Modal affichée avec ${artist.tracks.length} chansons`);
 }
 
 // Créer la modal si elle n'existe pas
